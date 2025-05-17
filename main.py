@@ -1,5 +1,8 @@
 import random
-import sys
+
+import typer
+
+app = typer.Typer()
 
 def generate_price_curve(n: int) -> list[float]:
     prices = []
@@ -8,9 +11,13 @@ def generate_price_curve(n: int) -> list[float]:
         prices.append(price)
     return prices
 
-if __name__ == '__main__':
-    granularity = sys.argv[1]
+@app.command()
+def pricecurve(granularity: str = typer.Option("h", "--granularity", "-g", help="Granularity: h (hourly) or hh (half-hourly)")):
     n = 48 if granularity == 'hh' else 24
     prices = generate_price_curve(n)
     for i, price in enumerate(prices):
         print(f"{i}: {price:.2f} USD")
+
+if __name__ == '__main__':
+    app()
+
