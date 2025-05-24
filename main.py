@@ -1,5 +1,8 @@
 import random
 
+from datetime import datetime, timedelta
+import pytz
+
 import typer
 
 app = typer.Typer()
@@ -27,6 +30,28 @@ def pricecurve(
 
         print(f"{time_label}: {price:.2f} {currency}")
 
-if __name__ == '__main__':
-    app()
+@app.command()
+def generate_price_curve(for_date_str: str, interval_minutes: int = 60):
+    for_date = datetime.strptime(for_date_str, "%Y-%m-%d")
+    tz = pytz.timezone("Europe/London")
 
+    start = tz.localize(datetime(for_date.year, for_date.month, for_date.day, 0, 0))
+    end = start + timedelta(days=1)
+
+    current = start
+    curve =[]
+    while current <= end:
+        time = current.strftime("%H:%M")
+        price = random.random() * 100
+        element = {
+            "time": time,
+            "price": price,
+            "currency": "USD",
+        }
+        curve.append(element)
+        current += timedelta(minutes=interval_minutes)
+        current = tz.normalize(current)
+    print(curve)
+
+if __name__ == "__main__":
+    app()
